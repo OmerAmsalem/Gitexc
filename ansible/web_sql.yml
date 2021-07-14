@@ -1,0 +1,51 @@
+- name: Install latest Apache server
+  hosts: dev
+  become: true
+  vars_files:
+   - fvars/vars.yml
+  tasks:
+
+          - name: Install apache httpd
+            apt:
+              name: apache2
+              update_cache: yes
+              state: present
+
+
+          - name: put welcome on ..../index.html
+            copy:
+              content: "Welcome to test server"
+              dest: /var/www/html/index.html
+
+
+          - name: Start service apache, if not started
+            service:
+              name: "{{ web_service }}"
+              state: started
+              enabled: yes
+
+
+          - name: Start service mysql, if not started
+            service:
+              name: "{{ mysql_service }}"
+              state: started
+              enabled: yes
+           
+          - name: ensuring webpkg and mysql are installed
+            apt:
+              name:
+              - "{{ vars.mysql_pkg }}"
+              - "{{ vars.web_pkg }}"
+              upadte_cache: yes
+              state: present
+              
+- name: http check
+  hosts: localhost
+  become: false
+  tasks:
+
+          - name: http checkin
+            uri:
+              url: http://172.31.26.154
+              return_content: yes
+              status_code: 200

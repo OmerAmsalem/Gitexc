@@ -1,0 +1,24 @@
+---
+- name: create users
+  hosts: all
+  vars_files:
+    - fvars/users_list.yml
+    - vault/users_pass.yml
+  become: true
+  tasks:
+       - name: ensure group devops
+         group:
+            name: devops
+            state: present
+         when: "'dev' in group_names"
+
+       - name: Create developers
+         user:
+           name: "{{ item.username }}"
+           group: devops
+           password: "{{ pw_dev |  password_hash('sha512') }}"
+         when:
+                 - "'dev' in group_names"
+                 - "developer' == { { item.job }} " 
+         loop: "{{ users }}"    
+
