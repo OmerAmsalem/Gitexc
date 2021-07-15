@@ -19,6 +19,22 @@
            password: "{{ pw_dev |  password_hash('sha512') }}"
          when:
                  - "'dev' in group_names"
-                 - "developer' == { { item.job }} " 
-         loop: "{{ users }}"    
+                 - ('developer' in item.job) 
+         loop: "{{ users }}"   
 
+
+       - name: ensure managers group 
+         group: 
+            name: managers
+            state: present
+         when: "'prod' in group_names"    
+           
+       - name: create managers
+         user:
+           name: "{{ item.username }}"
+           group: managers
+           password: "{{ pw_mgr | password_hash('sha512') }}"
+         when: 
+              - "'prod' in group_names"
+              - ('manager' in item.job)
+         loop: "{{ users }}"                     
