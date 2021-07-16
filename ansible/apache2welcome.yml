@@ -1,0 +1,5 @@
+---
+- name: apache2 playbook
+  hosts: dev
+  roles:
+      - apache2_welcome
